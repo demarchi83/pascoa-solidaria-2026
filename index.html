@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Páscoa Solidária 🐰</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #fff0f5;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        input, textarea {
+            width: 90%;
+            padding: 8px;
+            margin: 5px;
+        }
+
+        button {
+            background: #ff4d6d;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        img {
+            width: 250px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        #pixCopia {
+            width: 95%;
+            height: 140px;
+            font-size: 15px;
+        }
+
+        .info {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🐰 Páscoa Solidária</h1>
+
+<!-- 📸 FOTO -->
+<div class="box flex">
+    <img src="imagens/imagem_cesta_pascoa.JPEG" class="img-lado">
+    
+    <div>
+        <h3>🎁 Nossa ação</h3>
+        <p>
+            Participe da nossa campanha de Páscoa Solidária 🐰✨<br>
+            Cada R$15 dá direito a 1 palpite!
+        </p>
+    </div>
+</div>
+
+<!-- 💰 PIX -->
+<div class="box">
+    <h3>💰 Faça sua doação</h3>
+
+    <p><b>Chave Pix:</b></p>
+    <p id="pix">95216880178</p>
+
+    <button onclick="copiarPix()">Copiar chave Pix</button>
+
+    <br><br>
+
+    <p><b>Pix copia e cola:</b></p>
+    <textarea id="pixCopia">
+00020126700014br.gov.bcb.pix0122gisa.almeida@bb.com.br0222Gincana Solidaria Ecoa520400005303986540515.005802BR5925GISELLE DOS SANTOS ALMEID6015VALPARAISO DE G62080504Ecoa63049E9D
+    </textarea>
+
+    <button onclick="copiarPixCompleto()">Copiar código Pix</button>
+
+    <br><br>
+
+    <img src="imagens/qr_code_pascoa.jpeg">
+	
+</div>
+
+<!-- 🎯 FORMULÁRIO -->
+<div class="box">
+
+<input id="nome" placeholder="Seu nome"><br>
+
+<input id="valor" type="number" placeholder="Valor doado" oninput="calcular()"><br>
+
+<p id="qtd" class="info"></p>
+
+<textarea id="palpites" placeholder="Um palpite por linha"></textarea><br>
+
+<button onclick="enviar()">Enviar</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+function calcular() {
+    let valor = parseFloat(document.getElementById("valor").value) || 0;
+    let quantidade = Math.floor(valor / 15);
+
+    document.getElementById("qtd").innerText =
+    "Você pode dar até " + quantidade + " palpites";
+}
+
+function copiarPix() {
+    let pix = document.getElementById("pix").innerText;
+    navigator.clipboard.writeText(pix);
+    document.getElementById("msg").innerText = "Chave Pix copiada 👍";
+
+    setTimeout(() => {
+        document.getElementById("msg").innerText = "";
+    }, 3000);
+}
+
+function copiarPixCompleto() {
+    let pix = document.getElementById("pixCopia").value;
+    navigator.clipboard.writeText(pix);
+    document.getElementById("msg").innerText = "Código Pix copiado 👍";
+
+    setTimeout(() => {
+        document.getElementById("msg").innerText = "";
+    }, 3000);
+}
+
+function enviar() {
+    let nome = document.getElementById("nome").value;
+    let valor = parseFloat(document.getElementById("valor").value) || 0;
+    let palpitesTexto = document.getElementById("palpites").value.trim();
+
+    let palpites = palpitesTexto.split("\n").filter(p => p.trim() !== "");
+
+    let quantidade = Math.floor(valor / 15);
+
+    if (!nome) {
+        document.getElementById("msg").innerText = "Digite seu nome";
+        return;
+    }
+
+    if (valor < 15) {
+        document.getElementById("msg").innerText = "Valor mínimo é R$15";
+        return;
+    }
+
+    if (palpites.length === 0) {
+        document.getElementById("msg").innerText = "Digite pelo menos 1 palpite";
+        return;
+    }
+
+    if (palpites.length > quantidade) {
+        document.getElementById("msg").innerText =
+        "Máximo de " + quantidade + " palpites";
+        return;
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbxBSFenNtFDUDuOiJGHaRLpBVw1VvQPCRb_aK30zWFbxd66F1sM3_XOyJJKg5YFEmY/exec", {
+        method: "POST",
+        body: JSON.stringify({
+            nome: nome,
+            valor: valor,
+            quantidade: quantidade,
+            palpites: palpites.join(", ")
+        })
+    })
+    .then(() => {
+        document.getElementById("msg").innerText = "Enviado com sucesso! 🎉";
+
+        // LIMPAR CAMPOS
+        document.getElementById("nome").value = "";
+        document.getElementById("valor").value = "";
+        document.getElementById("palpites").value = "";
+        document.getElementById("qtd").innerText = "";
+
+        setTimeout(() => {
+            document.getElementById("msg").innerText = "";
+        }, 3000);
+    });
+}
+</script>
+
+</body>
+</html>
