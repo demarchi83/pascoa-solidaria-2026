@@ -117,7 +117,7 @@ function calcular() {
     let quantidade = Math.floor(valor / 15);
 
     document.getElementById("qtd").innerText =
-    "Você pode dar até " + quantidade + " palpites";
+    "Você deve enviar exatamente " + quantidade + " palpites";
 }
 
 function copiarPix() {
@@ -146,7 +146,6 @@ function enviar() {
     let palpitesTexto = document.getElementById("palpites").value.trim();
 
     let palpites = palpitesTexto.split("\n").filter(p => p.trim() !== "");
-
     let quantidade = Math.floor(valor / 15);
 
     if (!nome) {
@@ -160,18 +159,22 @@ function enviar() {
     }
 
     if (palpites.length === 0) {
-        document.getElementById("msg").innerText = "Digite pelo menos 1 palpite";
+        document.getElementById("msg").innerText = "Digite seus palpites";
         return;
     }
 
-    if (palpites.length > quantidade) {
+    // ✅ CORREÇÃO AQUI
+    if (palpites.length !== quantidade) {
         document.getElementById("msg").innerText =
-        "Máximo de " + quantidade + " palpites";
+        "Para R$" + valor + ", você precisa enviar exatamente " + quantidade + " palpites.";
         return;
     }
 
     fetch("https://script.google.com/macros/s/AKfycbxBSFenNtFDUDuOiJGHaRLpBVw1VvQPCRb_aK30zWFbxd66F1sM3_XOyJJKg5YFEmY/exec", {
         method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
             nome: nome,
             valor: valor,
@@ -182,7 +185,6 @@ function enviar() {
     .then(() => {
         document.getElementById("msg").innerText = "Enviado com sucesso! 🎉";
 
-        // LIMPAR CAMPOS
         document.getElementById("nome").value = "";
         document.getElementById("valor").value = "";
         document.getElementById("palpites").value = "";
